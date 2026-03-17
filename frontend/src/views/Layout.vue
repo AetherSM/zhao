@@ -1,0 +1,198 @@
+<template>
+  <div class="layout">
+    <aside class="sider">
+      <div class="logo">TMS</div>
+      <el-menu :default-active="route.path" router class="menu">
+        <el-menu-item index="/dashboard">
+          <el-icon><Monitor /></el-icon>
+          <span>仪表盘</span>
+        </el-menu-item>
+        
+        <el-sub-menu v-if="canAny(['SUPER_ADMIN','ORG_ADMIN'])" index="student-mgmt">
+          <template #title>
+            <el-icon><User /></el-icon>
+            <span>学员与报名</span>
+          </template>
+          <el-menu-item index="/students">学员管理</el-menu-item>
+          <el-menu-item index="/enroll">课程报名</el-menu-item>
+        </el-sub-menu>
+
+        <el-sub-menu v-if="canAny(['SUPER_ADMIN','ORG_ADMIN'])" index="course-mgmt">
+          <template #title>
+            <el-icon><Reading /></el-icon>
+            <span>课程管理</span>
+          </template>
+          <el-menu-item index="/course-categories">课程分类</el-menu-item>
+          <el-menu-item index="/courses">所有课程</el-menu-item>
+        </el-sub-menu>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN'])" index="/teachers">
+          <el-icon><Avatar /></el-icon>
+          <span>教师管理</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/schedule">
+          <el-icon><Calendar /></el-icon>
+          <span>排课查询</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/attendance">
+          <el-icon><Checked /></el-icon>
+          <span>我的考勤</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/resources">
+          <el-icon><Files /></el-icon>
+          <span>学习资源</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','STUDENT'])" index="/reviews">
+          <el-icon><ChatDotRound /></el-icon>
+          <span>评价反馈</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','FINANCE'])" index="/payments">
+          <el-icon><CreditCard /></el-icon>
+          <span>缴费管理</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','FINANCE'])" index="/statistics">
+          <el-icon><PieChart /></el-icon>
+          <span>统计分析</span>
+        </el-menu-item>
+      </el-menu>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="header-left">
+          <h2 class="title">辅导机构管理系统</h2>
+        </div>
+        <div class="user">
+          <el-tag effect="plain" class="role-tag">{{ roleText }}</el-tag>
+          <span class="name">{{ auth.user?.username }}</span>
+          <el-button type="danger" plain size="small" @click="onLogout">退出</el-button>
+        </div>
+      </header>
+      <section class="content">
+        <router-view />
+      </section>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../store/auth'
+import { Monitor, User, Reading, Avatar, Calendar, Checked, CreditCard, PieChart, Files, ChatDotRound } from '@element-plus/icons-vue'
+
+const route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
+
+const roleText = computed(() => {
+  const roles = auth.user?.roles || []
+  if (roles.includes('SUPER_ADMIN')) return '系统管理员'
+  if (roles.includes('ORG_ADMIN')) return '机构管理员'
+  if (roles.includes('FINANCE')) return '财务管理'
+  if (roles.includes('TEACHER')) return '任课教师'
+  if (roles.includes('STUDENT')) return '学生/家长'
+  return '普通用户'
+})
+
+function canAny(roleCodes) {
+  const roles = auth.user?.roles || []
+  return roleCodes.some((r) => roles.includes(r))
+}
+
+function onLogout() {
+  auth.logout()
+  router.replace('/login')
+}
+</script>
+
+<style scoped>
+.layout {
+  height: 100vh;
+  display: flex;
+}
+.sider {
+  width: 240px;
+  background: #001529;
+  color: #fff;
+  transition: width 0.3s;
+}
+.logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: #409eff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.menu {
+  border-right: none;
+  background: transparent;
+}
+.menu :deep(.el-menu-item) {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+.menu :deep(.el-menu-item:hover) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+.menu :deep(.el-menu-item.is-active) {
+  color: #fff;
+  background: #409eff !important;
+}
+.menu :deep(.el-sub-menu__title) {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+.menu :deep(.el-sub-menu__title:hover) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.main {
+  flex: 1;
+  background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  height: 64px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  z-index: 10;
+}
+.title {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+.content {
+  padding: 24px;
+  overflow: auto;
+  flex: 1;
+}
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.name {
+  font-weight: 600;
+  color: #333;
+}
+.role-tag {
+  margin-right: 4px;
+}
+</style>
+
