@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> roleCodes = sysRoleMapper.selectRoleCodesByUserId(user.getId());
         String token = jwtTokenProvider.createToken(user.getId(), user.getUsername(), roleCodes);
-        return new LoginResp(token, "Bearer", user.getId(), user.getUsername(), roleCodes);
+        return new LoginResp(token, "Bearer", user.getId(), user.getUsername(), user.getRealName(), roleCodes);
     }
 
     @Override
@@ -129,5 +129,28 @@ public class AuthServiceImpl implements AuthService {
             sysUserStudentMapper.insert(us);
         }
     }
-}
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProfile(Long userId, String username, String realName, String password) {
+        SysUser user = sysUserMapper.selectById(userId);
+        if (user == null) throw new BizException("用户不存在");
+
+        if (username != null && !username.equals(user.getUsername())) {
+            SysUser exist = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username));
+            if (exist != null) throw new BizException("账号已存在");
+            user.setUsername(username);
+        }
+
+        if (realName != null) {
+            user.setRealName(realName);
+        }
+
+        if (password != null && !password.isEmpty()) {
+            user.setPassword(encoder.encode(password));
+        }
+
+        user.setUpdateTime(LocalDateTime.now());
+        sysUserMapper.updateById(user);
+    }
+}

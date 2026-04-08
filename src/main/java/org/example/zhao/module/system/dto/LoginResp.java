@@ -12,6 +12,7 @@ public class LoginResp {
     private String tokenType;
     private Long userId;
     private String username;
+    private String realName;
     private List<String> roles;
 }
 

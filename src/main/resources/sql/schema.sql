@@ -210,9 +210,22 @@ CREATE TABLE IF NOT EXISTS learning_resource (
   KEY idx_teacher_id (teacher_id)
 ) COMMENT='学习资源表';
 
+-- 3. Chat Messages (Parent-Teacher Communication)
+CREATE TABLE IF NOT EXISTS chat_message (
+  id           BIGINT        NOT NULL PRIMARY KEY,
+  from_user_id BIGINT        NOT NULL COMMENT '发送者ID',
+  to_user_id   BIGINT        NOT NULL COMMENT '接收者ID',
+  content      TEXT          NOT NULL COMMENT '消息内容',
+  is_read      TINYINT       NOT NULL DEFAULT 0 COMMENT '是否已读（0 否 / 1 是）',
+  create_time  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_from_user (from_user_id),
+  KEY idx_to_user (to_user_id),
+  KEY idx_create_time (create_time)
+) COMMENT='聊天消息表';
+
 -- =====================
 -- Seed data (roles + admin)
--- Demo password: 123456 (生产环境请改为 BCrypt 存储)
+-- =====================Demo password: 123456 (生产环境请改为 BCrypt 存储)
 -- =====================
 
 INSERT INTO sys_role (id, role_name, role_code, description)

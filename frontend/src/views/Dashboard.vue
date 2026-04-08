@@ -5,7 +5,7 @@
         <el-card class="welcome-card" shadow="hover">
           <div class="welcome-content">
             <div class="text">
-              <h2>下午好, {{ auth.user?.username }}!</h2>
+              <h2>下午好, {{ auth.user?.realName }}!</h2>
               <p>欢迎回到辅导机构管理系统。今天是 {{ today }}。</p>
             </div>
             <el-tag size="large">{{ roleText }}</el-tag>

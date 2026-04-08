@@ -84,8 +84,13 @@ async function onLogin() {
   loading.value = true
   try {
     const res = await loginApi(form)
-    auth.setLogin(res.token, { userId: res.userId, username: res.username, roles: res.roles })
-    ElMessage.success('欢迎回来, ' + res.username)
+    auth.setLogin(res.token, { 
+      userId: res.userId, 
+      username: res.username, 
+      realName: res.realName, 
+      roles: res.roles 
+    })
+    ElMessage.success('欢迎回来, ' + (res.realName || res.username))
     router.replace('/')
   } catch (e) {
     ElMessage.error(e.message || '登录失败')

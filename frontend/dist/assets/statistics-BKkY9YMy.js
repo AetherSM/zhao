@@ -1,0 +1,1 @@
+import{x as s}from"./index-CZhyERvb.js";function a(t){return s.get("/api/v1/statistics/student",{params:t})}function i(t){return s.get("/api/v1/statistics/course",{params:t})}function n(t){return s.get("/api/v1/statistics/revenue",{params:t})}export{i as a,n as b,a as s};

@@ -24,7 +24,8 @@ const routes = [
       { path: '/attendance', component: () => import('../views/Attendance.vue') },
       { path: '/reviews', component: () => import('../views/CourseReview.vue') },
       { path: '/resources', component: () => import('../views/LearningResource.vue') },
-      { path: '/statistics', component: () => import('../views/Statistics.vue') }
+      { path: '/statistics', component: () => import('../views/Statistics.vue') },
+      { path: '/chat', component: () => import('../views/Chat.vue') }
     ]
   }
 ]

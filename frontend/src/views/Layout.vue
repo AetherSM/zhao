@@ -51,6 +51,11 @@
           <span>评价反馈</span>
         </el-menu-item>
 
+        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/chat">
+          <el-icon><ChatLineRound /></el-icon>
+          <span>家校沟通</span>
+        </el-menu-item>
+
         <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','FINANCE'])" index="/payments">
           <el-icon><CreditCard /></el-icon>
           <span>缴费管理</span>
@@ -69,7 +74,7 @@
         </div>
         <div class="user">
           <el-tag effect="plain" class="role-tag">{{ roleText }}</el-tag>
-          <span class="name">{{ auth.user?.username }}</span>
+          <span class="name" @click="showProfile = true" style="cursor: pointer; color: #409eff;">{{ auth.user?.realName }}</span>
           <el-button type="danger" plain size="small" @click="onLogout">退出</el-button>
         </div>
       </header>
@@ -77,18 +82,74 @@
         <router-view />
       </section>
     </main>
+
+    <!-- 个人信息修改对话框 -->
+    <el-dialog v-model="showProfile" title="修改个人信息" width="400px">
+      <el-form :model="profileForm" label-width="80px">
+        <el-form-item label="账号">
+          <el-input v-model="profileForm.username" placeholder="请输入新账号" />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="profileForm.realName" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="profileForm.password" type="password" placeholder="不修改请留空" show-password />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showProfile = false">取消</el-button>
+        <el-button type="primary" @click="handleUpdateProfile" :loading="updating">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store/auth'
-import { Monitor, User, Reading, Avatar, Calendar, Checked, CreditCard, PieChart, Files, ChatDotRound } from '@element-plus/icons-vue'
+import { updateProfileApi } from '../api/user'
+import { ElMessage } from 'element-plus'
+import { Monitor, User, Reading, Avatar, Calendar, Checked, CreditCard, PieChart, Files, ChatDotRound, ChatLineRound } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+
+const showProfile = ref(false)
+const updating = ref(false)
+const profileForm = reactive({
+  username: '',
+  realName: '',
+  password: ''
+})
+
+// 监听对话框打开，重新填充数据
+watch(showProfile, (val) => {
+  if (val) {
+    profileForm.username = auth.user?.username || ''
+    profileForm.realName = auth.user?.realName || ''
+    profileForm.password = ''
+  }
+})
+
+async function handleUpdateProfile() {
+  if (!profileForm.username) return ElMessage.warning('账号不能为空')
+  if (!profileForm.realName) return ElMessage.warning('用户名不能为空')
+  updating.value = true
+  try {
+    const res = await updateProfileApi(profileForm)
+    // 根据拦截器逻辑，res 如果是成功请求则直接返回 data，如果失败则可能抛出错误或返回错误对象
+    // 如果没有抛出错误，说明请求是成功的
+    ElMessage.success('修改成功，请重新登录')
+    onLogout()
+  } catch (e) {
+    console.error('Update profile error:', e)
+    ElMessage.error(e.msg || e.message || '修改失败')
+  } finally {
+    updating.value = false
+  }
+}
 
 const roleText = computed(() => {
   const roles = auth.user?.roles || []
@@ -146,7 +207,19 @@ function onLogout() {
   background: rgba(255, 255, 255, 0.1);
 }
 .menu :deep(.el-menu-item.is-active) {
-  color: #fff;
+  color: #fff !important;
+  background: #409eff !important;
+}
+.menu :deep(.el-sub-menu.is-active .el-sub-menu__title) {
+  color: #fff !important;
+}
+.menu :deep(.el-menu--inline .el-menu-item) {
+  background: #000c17;
+}
+.menu :deep(.el-menu--inline .el-menu-item:hover) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.menu :deep(.el-menu--inline .el-menu-item.is-active) {
   background: #409eff !important;
 }
 .menu :deep(.el-sub-menu__title) {
