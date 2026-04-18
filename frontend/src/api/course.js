@@ -29,3 +29,7 @@ export function deleteCourse(id) {
   return http.delete(`/api/v1/course/${id}`)
 }
 
+export function getAllCourseNames() {
+  return http.get('/api/v1/course/all-names')
+}
+

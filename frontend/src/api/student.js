@@ -13,3 +13,7 @@ export function deleteStudent(id) {
   return http.delete(`/api/v1/student/${id}`)
 }
 
+export function getAllStudentNames() {
+  return http.get('/api/v1/student/all-names')
+}
+

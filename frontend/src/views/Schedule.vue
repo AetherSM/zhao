@@ -1,20 +1,32 @@
 <template>
   <el-card>
     <div class="toolbar">
-      <el-input v-if="isAdmin" v-model="q.teacherId" placeholder="教师ID" clearable style="width: 160px" />
-      <el-input v-model="q.courseId" placeholder="课程ID" clearable style="width: 160px" />
+      <el-select v-if="isAdmin" v-model="q.teacherId" placeholder="选择教师" clearable style="width: 180px">
+        <el-option v-for="t in teachers" :key="t.id" :label="t.teacherName" :value="t.id" />
+      </el-select>
+      <el-select v-model="q.courseId" placeholder="选择课程" clearable style="width: 180px">
+        <el-option v-for="c in courses" :key="c.id" :label="c.courseName" :value="c.id" />
+      </el-select>
       <el-date-picker v-model="q.scheduleDate" type="date" value-format="YYYY-MM-DD" placeholder="日期" />
       <el-button type="primary" @click="load">查询</el-button>
       <el-button v-if="isAdmin || isTeacher" type="success" @click="openCreate">新增排课</el-button>
     </div>
     <el-table :data="rows" border>
-      <el-table-column prop="id" label="ID" width="120" />
-      <el-table-column prop="courseId" label="课程ID" width="120" />
-      <el-table-column v-if="isAdmin" prop="teacherId" label="教师ID" width="120" />
+      <el-table-column prop="id" label="ID" width="100" />
+      <el-table-column label="课程名称" width="200">
+        <template #default="{ row }">
+          {{ getCourseName(row.courseId) }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="isAdmin" label="任课教师" width="150">
+        <template #default="{ row }">
+          {{ getTeacherName(row.teacherId) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="classroom" label="教室" width="140" />
       <el-table-column prop="scheduleDate" label="日期" width="120" />
       <el-table-column prop="classPeriod" label="节次" />
-      <el-table-column v-if="isAdmin || isTeacher" label="操作" width="140">
+      <el-table-column v-if="isAdmin || isTeacher" label="操作" width="100">
         <template #default="{ row }">
           <el-button size="small" type="danger" plain @click="onDel(row)">删除</el-button>
         </template>
@@ -68,6 +80,16 @@ const teachers = ref([])
 const total = ref(0)
 const page = ref(1)
 const size = ref(10)
+
+function getCourseName(id) {
+  const c = courses.value.find(x => x.id === id)
+  return c ? c.courseName : id
+}
+
+function getTeacherName(id) {
+  const t = teachers.value.find(x => x.id === id)
+  return t ? t.teacherName : id
+}
 
 const dlg = ref(false)
 const form = reactive({ courseId: '', teacherId: '', classroom: '', scheduleDate: '', classPeriod: '' })

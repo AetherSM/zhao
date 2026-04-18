@@ -9,6 +9,11 @@ import org.example.zhao.module.biz.mapper.CourseMapper;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/v1/course")
 @RequiredArgsConstructor
@@ -31,7 +36,7 @@ public class CourseController {
     }
 
     @GetMapping("/listAll")
-    public R<java.util.List<Course>> listAll() {
+    public R<List<Course>> listAll() {
         return R.ok(courseMapper.selectList(new LambdaQueryWrapper<Course>().orderByAsc(Course::getCourseName)));
     }
 
@@ -53,5 +58,24 @@ public class CourseController {
         courseMapper.deleteById(id);
         return R.ok();
     }
-}
 
+    /**
+     * 获取所有课程的 ID 和名称，用于下拉选择
+     */
+    @GetMapping("/all-names")
+    public R<List<Map<String, Object>>> getAllCourseNames() {
+        List<Course> courses = courseMapper.selectList(new LambdaQueryWrapper<Course>()
+                .select(Course::getId, Course::getCourseName)
+                .eq(Course::getDeleted, 0));
+
+        List<Map<String, Object>> result = courses.stream()
+                .map(c -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", c.getId().toString()); // 转换为String避免前端精度问题
+                    map.put("name", c.getCourseName());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return R.ok(result);
+    }
+}

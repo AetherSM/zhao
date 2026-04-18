@@ -24,8 +24,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="courseId" label="课程ID" width="100" />
-        <el-table-column prop="teacherId" label="教师ID" width="100" />
+        <el-table-column label="对应课程" width="200">
+          <template #default="{ row }">
+            {{ getCourseName(row.courseId) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="content" label="资源描述或链接" />
         <el-table-column prop="createTime" label="发布时间" width="180">
           <template #default="{ row }">
@@ -117,6 +120,11 @@ async function load() {
 async function fetchCourses() {
   const res = await listAllCourses()
   courses.value = res
+}
+
+function getCourseName(id) {
+  const c = courses.value.find(x => x.id === id)
+  return c ? c.courseName : id
 }
 
 function openResource() {

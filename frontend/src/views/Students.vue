@@ -85,21 +85,24 @@ function openCreate() {
   Object.assign(form, { id: null, studentName: '', gender: 1, age: null, grade: '', phone: '', enrollTime: '', address: '' })
   dlg.value = true
 }
-function openEdit(row) {
-  Object.assign(form, row)
-  dlg.value = true
-}
-async function onSave() {
-  try {
-    if (form.id) await updateStudent(form.id, form)
-    else await createStudent(form)
-    ElMessage.success('保存成功')
-    dlg.value = false
-    await load()
-  } catch (e) {
-    ElMessage.error(e.message || '保存失败')
+  function openEdit(row) {
+    console.log('ID from row (before assign):', row.id, 'Type:', typeof row.id);
+    // 使用解构赋值创建一个新对象，避免直接修改列表行数据
+    Object.assign(form, { ...row })
+    dlg.value = true
   }
-}
+  async function onSave() {
+    try {
+      console.log('ID being sent (before API call):', form.id, 'Type:', typeof form.id);
+      if (form.id) await updateStudent(form.id, form)
+      else await createStudent(form)
+      ElMessage.success('保存成功')
+      dlg.value = false
+      await load()
+    } catch (e) {
+      ElMessage.error(e.message || '保存失败')
+    }
+  }
 async function onDel(row) {
   await ElMessageBox.confirm('确认删除该学员？', '提示', { type: 'warning' })
   await deleteStudent(row.id)

@@ -1,16 +1,28 @@
 <template>
   <el-card>
     <div class="toolbar">
-      <el-input v-model="q.studentId" placeholder="学员ID" clearable style="width: 160px" />
-      <el-input v-model="q.courseId" placeholder="课程ID" clearable style="width: 160px" />
+      <el-select v-model="q.studentId" placeholder="选择学员" clearable style="width: 180px">
+        <el-option v-for="s in students" :key="s.id" :label="s.name" :value="s.id" />
+      </el-select>
+      <el-select v-model="q.courseId" placeholder="选择课程" clearable style="width: 180px">
+        <el-option v-for="c in courses" :key="c.id" :label="c.name" :value="c.id" />
+      </el-select>
       <el-button type="primary" @click="load">查询</el-button>
       <el-button v-if="isFinanceOrAdmin" type="success" @click="openCreate">新增缴费</el-button>
       <el-button v-if="isFinanceOrAdmin" type="warning" @click="loadArrears">欠费统计</el-button>
     </div>
     <el-table :data="rows" border>
-      <el-table-column prop="id" label="ID" width="120" />
-      <el-table-column prop="studentId" label="学员ID" width="120" />
-      <el-table-column prop="courseId" label="课程ID" width="120" />
+      <el-table-column prop="id" label="ID" width="100" />
+      <el-table-column label="学员姓名" width="150">
+        <template #default="{ row }">
+          {{ getStudentName(row.studentId) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="课程名称" width="200">
+        <template #default="{ row }">
+          {{ getCourseName(row.courseId) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="amount" label="金额" width="120" />
       <el-table-column prop="payType" label="方式" width="120" />
       <el-table-column prop="payTime" label="缴费时间" />
@@ -23,8 +35,16 @@
 
   <el-dialog v-model="dlg" title="新增缴费" width="560px">
     <el-form :model="form" label-width="90px">
-      <el-form-item label="学员ID"><el-input v-model="form.studentId" /></el-form-item>
-      <el-form-item label="课程ID"><el-input v-model="form.courseId" /></el-form-item>
+      <el-form-item label="学员姓名">
+        <el-select v-model="form.studentId" placeholder="请选择学员" filterable style="width: 100%">
+          <el-option v-for="s in students" :key="s.id" :label="s.name" :value="s.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="收费课程">
+        <el-select v-model="form.courseId" placeholder="请选择课程" filterable style="width: 100%">
+          <el-option v-for="c in courses" :key="c.id" :label="c.name" :value="c.id" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="金额"><el-input v-model="form.amount" /></el-form-item>
       <el-form-item label="方式"><el-input v-model="form.payType" placeholder="现金/微信/支付宝" /></el-form-item>
       <el-form-item label="时间"><el-date-picker v-model="form.payTime" type="datetime" value-format="YYYY-MM-DDTHH:mm:ss" /></el-form-item>
@@ -52,9 +72,11 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { listPayments, createPayment, listArrears } from '../api/payment'
+import { getAllStudentNames } from '../api/student'
+import { getAllCourseNames } from '../api/course'
 import { useAuthStore } from '../store/auth'
 
 const auth = useAuthStore()
@@ -66,12 +88,38 @@ const total = ref(0)
 const page = ref(1)
 const size = ref(10)
 
+const students = ref([])
+const courses = ref([])
+
 const dlg = ref(false)
 const form = reactive({ studentId: '', courseId: '', amount: '', payType: '微信', payTime: '', remark: '' })
 
 const dlg2 = ref(false)
 const arrearsQ = reactive({ studentName: '' })
 const arrearsRows = ref([])
+
+async function fetchOptions() {
+  try {
+    const [stuRes, courRes] = await Promise.all([
+      getAllStudentNames(),
+      getAllCourseNames()
+    ])
+    students.value = stuRes || []
+    courses.value = courRes || []
+  } catch (e) {
+    console.error('加载选项失败', e)
+  }
+}
+
+function getStudentName(id) {
+  const s = students.value.find(x => x.id === String(id))
+  return s ? s.name : id
+}
+
+function getCourseName(id) {
+  const c = courses.value.find(x => x.id === String(id))
+  return c ? c.name : id
+}
 
 async function load() {
   const params = { page: page.value, size: size.value }
@@ -113,7 +161,10 @@ async function loadArrears() {
   arrearsRows.value = data.records || []
 }
 
-load()
+onMounted(async () => {
+  await fetchOptions()
+  load()
+})
 </script>
 
 <style scoped>
