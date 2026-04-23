@@ -70,7 +70,7 @@ import { listAllTeachers } from '../api/teacher'
 import { useAuthStore } from '../store/auth'
 
 const auth = useAuthStore()
-const isAdmin = computed(() => auth.user?.roles.some(r => ['SUPER_ADMIN', 'ORG_ADMIN'].includes(r)))
+const isAdmin = computed(() => auth.user?.roles.includes('ADMIN'))
 const isTeacher = computed(() => auth.user?.roles.includes('TEACHER'))
 
 const q = reactive({ teacherId: '', courseId: '', scheduleDate: '' })

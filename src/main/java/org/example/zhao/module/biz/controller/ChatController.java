@@ -27,11 +27,12 @@ public class ChatController {
      */
     @PostMapping("/send")
     public R<Long> sendMessage(@RequestBody ChatMessage msg) {
+        /*从Spring Security的上下文中获取当前登录用户的ID*/
         Long currentUserId = SecurityUtil.currentUserId();
         if (currentUserId == null) return R.fail("未登录");
 
         msg.setFromUserId(currentUserId);
-        msg.setIsRead(0);
+        msg.setIsRead(0);/*默认未读*/
         msg.setCreateTime(LocalDateTime.now());
         chatMessageMapper.insert(msg);
         return R.ok(msg.getId());

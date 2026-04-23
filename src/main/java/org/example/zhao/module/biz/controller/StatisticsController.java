@@ -8,6 +8,7 @@ import org.example.zhao.module.biz.dto.StatItem;
 import org.example.zhao.module.biz.mapper.CourseMapper;
 import org.example.zhao.module.biz.mapper.PaymentMapper;
 import org.example.zhao.module.biz.mapper.StudentMapper;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,11 +51,13 @@ public class StatisticsController {
     }
 
     @GetMapping("/revenue")
-    public R<List<RevenueItem>> revenue(@RequestParam LocalDate startTime,
-                                        @RequestParam LocalDate endTime,
+    public R<List<RevenueItem>> revenue(@RequestParam String startTime,
+                                        @RequestParam String endTime,
                                         @RequestParam(defaultValue = "month") String type) {
-        LocalDateTime start = startTime.atStartOfDay();
-        LocalDateTime end = endTime.plusDays(1).atStartOfDay().minusSeconds(1);
+        LocalDate startLocalDate = LocalDate.parse(startTime);
+        LocalDate endLocalDate = LocalDate.parse(endTime);
+        LocalDateTime start = startLocalDate.atStartOfDay();
+        LocalDateTime end = endLocalDate.plusDays(1).atStartOfDay().minusSeconds(1);
 
         if ("day".equalsIgnoreCase(type)) {
             return R.ok(paymentMapper.statRevenueByDay(start, end));

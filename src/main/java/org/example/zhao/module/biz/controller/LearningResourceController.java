@@ -40,7 +40,7 @@ public class LearningResourceController {
             Long teacherId = teacherBindingService.getTeacherIdByUserId(uid);
             if (teacherId == null) throw new BizException("教师账号未绑定教师信息");
             req.setTeacherId(teacherId);
-        } else if (SecurityUtil.hasRole("SUPER_ADMIN") || SecurityUtil.hasRole("ORG_ADMIN")) {
+        } else if (SecurityUtil.hasRole("ADMIN")) {
             // Admin can publish without teacherId, or we could let them specify one.
             // For now, allow null as we updated the DB schema.
         } else {
@@ -62,7 +62,7 @@ public class LearningResourceController {
             if (teacherId == null || !teacherId.equals(res.getTeacherId())) {
                 throw new BizException("只能删除自己发布的资源");
             }
-        } else if (!SecurityUtil.hasRole("SUPER_ADMIN") && !SecurityUtil.hasRole("ORG_ADMIN")) {
+        } else if (!SecurityUtil.hasRole("ADMIN")) {
             throw new BizException("无权执行删除操作");
         }
         learningResourceMapper.deleteById(id);

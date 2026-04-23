@@ -51,8 +51,8 @@ public class CourseReviewController {
 
     @DeleteMapping("/{id}")
     public R<Void> delete(@PathVariable Long id) {
-        if (!SecurityUtil.hasRole("SUPER_ADMIN") && !SecurityUtil.hasRole("ORG_ADMIN")) {
-            throw new BizException("无权执行删除操作");
+        if (!SecurityUtil.hasRole("ADMIN")) {
+            throw new BizException("仅管理员可删除课程评价");
         }
         courseReviewMapper.deleteById(id);
         return R.ok();

@@ -25,7 +25,8 @@ const routes = [
       { path: '/reviews', component: () => import('../views/CourseReview.vue') },
       { path: '/resources', component: () => import('../views/LearningResource.vue') },
       { path: '/statistics', component: () => import('../views/Statistics.vue') },
-      { path: '/chat', component: () => import('../views/Chat.vue') }
+      { path: '/chat', component: () => import('../views/Chat.vue') },
+      { path: '/role-scope', component: () => import('../views/RoleScope.vue') }
     ]
   }
 ]

@@ -1,0 +1,1 @@
+import{z as t}from"./index-DaHCRH6N.js";function c(e){return t.get("/api/v1/teacher/list",{params:e})}function i(){return t.get("/api/v1/teacher/listAll")}function n(e){return t.post("/api/v1/teacher",e)}function s(e,a){return t.put(`/api/v1/teacher/${e}`,a)}function u(e){return t.delete(`/api/v1/teacher/${e}`)}export{i as a,n as c,u as d,c as l,s as u};

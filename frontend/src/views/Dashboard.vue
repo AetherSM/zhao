@@ -75,15 +75,14 @@ const auth = useAuthStore()
 
 const today = new Date().toLocaleDateString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 
-const isAdmin = computed(() => auth.user?.roles.some(r => ['SUPER_ADMIN', 'ORG_ADMIN'].includes(r)))
+const isAdmin = computed(() => auth.user?.roles.includes('ADMIN'))
 const isTeacher = computed(() => auth.user?.roles.includes('TEACHER'))
 const isFinance = computed(() => auth.user?.roles.includes('FINANCE'))
 const isStudent = computed(() => auth.user?.roles.includes('STUDENT'))
 
 const roleText = computed(() => {
   const roles = auth.user?.roles || []
-  if (roles.includes('SUPER_ADMIN')) return '系统管理员'
-  if (roles.includes('ORG_ADMIN')) return '机构管理员'
+  if (roles.includes('ADMIN')) return '管理员'
   if (roles.includes('FINANCE')) return '财务管理'
   if (roles.includes('TEACHER')) return '任课教师'
   if (roles.includes('STUDENT')) return '学生/家长'

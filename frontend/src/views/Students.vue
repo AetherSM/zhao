@@ -50,6 +50,16 @@
       <el-form-item label="手机号"><el-input v-model="form.phone" /></el-form-item>
       <el-form-item label="入学时间"><el-date-picker v-model="form.enrollTime" type="date" value-format="YYYY-MM-DD" /></el-form-item>
       <el-form-item label="地址"><el-input v-model="form.address" /></el-form-item>
+      
+      <template v-if="!form.id">
+        <el-divider content-position="left">系统账号 (必填)</el-divider>
+        <el-form-item label="用户名" required>
+          <el-input v-model="form.username" placeholder="建议使用手机号" />
+        </el-form-item>
+        <el-form-item label="密码" required>
+          <el-input v-model="form.password" type="password" placeholder="默认 123456" />
+        </el-form-item>
+      </template>
     </el-form>
     <template #footer>
       <el-button @click="dlg=false">取消</el-button>
@@ -65,7 +75,7 @@ import { listStudents, createStudent, updateStudent, deleteStudent } from '../ap
 import { useAuthStore } from '../store/auth'
 
 const auth = useAuthStore()
-const isAdmin = computed(() => auth.user?.roles.some(r => ['SUPER_ADMIN', 'ORG_ADMIN'].includes(r)))
+const isAdmin = computed(() => auth.user?.roles.includes('ADMIN'))
 
 const q = reactive({ studentName: '', grade: '', phone: '' })
 const rows = ref([])
@@ -74,7 +84,7 @@ const page = ref(1)
 const size = ref(10)
 
 const dlg = ref(false)
-const form = reactive({ id: null, studentName: '', gender: 1, age: null, grade: '', phone: '', enrollTime: '', address: '' })
+const form = reactive({ id: null, studentName: '', gender: 1, age: null, grade: '', phone: '', enrollTime: '', address: '', username: '', password: '' })
 
 async function load() {
   const data = await listStudents({ page: page.value, size: size.value, ...q })
@@ -82,7 +92,7 @@ async function load() {
   total.value = data.total || 0
 }
 function openCreate() {
-  Object.assign(form, { id: null, studentName: '', gender: 1, age: null, grade: '', phone: '', enrollTime: '', address: '' })
+  Object.assign(form, { id: null, studentName: '', gender: 1, age: null, grade: '', phone: '', enrollTime: '', address: '', username: '', password: '' })
   dlg.value = true
 }
   function openEdit(row) {

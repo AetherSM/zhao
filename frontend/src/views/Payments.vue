@@ -80,7 +80,7 @@ import { getAllCourseNames } from '../api/course'
 import { useAuthStore } from '../store/auth'
 
 const auth = useAuthStore()
-const isFinanceOrAdmin = computed(() => auth.user?.roles.some(r => ['SUPER_ADMIN', 'ORG_ADMIN', 'FINANCE'].includes(r)))
+const isFinanceOrAdmin = computed(() => auth.user?.roles.some(r => ['ADMIN', 'FINANCE'].includes(r)))
 
 const q = reactive({ studentId: '', courseId: '' })
 const rows = ref([])

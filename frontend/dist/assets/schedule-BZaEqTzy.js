@@ -1,0 +1,1 @@
+import{z as t}from"./index-DaHCRH6N.js";function u(e){return t.get("/api/v1/schedule/list",{params:e})}function l(e){return t.post("/api/v1/schedule",e)}function n(e){return t.get("/api/v1/schedule/checkConflict",{params:e})}function i(e){return t.delete(`/api/v1/schedule/${e}`)}export{l as a,n as c,i as d,u as l};

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.zhao.common.api.R;
 import org.example.zhao.module.biz.entity.Student;
 import org.example.zhao.module.biz.mapper.StudentMapper;
+import org.example.zhao.module.biz.dto.StudentCreateReq;
+import org.example.zhao.module.biz.service.StudentService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class StudentController {
 
     private final StudentMapper studentMapper;
+    private final StudentService studentService;
 
     @GetMapping("/list")
     public R<Page<Student>> list(@RequestParam(defaultValue = "1") long page,
@@ -42,21 +45,13 @@ public class StudentController {
     }
 
     @PostMapping
-    public R<Long> create(@RequestBody Student student) {
-        studentMapper.insert(student);
-        return R.ok(student.getId());
+    public R<Long> create(@RequestBody StudentCreateReq student) {
+        return R.ok(studentService.createStudent(student));
     }
 
     @PutMapping("/{id}")
     public R<Void> update(@PathVariable Long id, @RequestBody Student student) {
-        System.out.println("Received ID from path: " + id);
-        System.out.println("Received student object: " + student);
-        student.setId(id);
-        int updatedRows = studentMapper.updateById(student);
-        System.out.println("Updated rows: " + updatedRows);
-        if (updatedRows == 0) {
-            return R.fail("更新失败，学员不存在或已被删除");
-        }
+        studentService.updateStudent(id, student);
         return R.ok();
     }
 

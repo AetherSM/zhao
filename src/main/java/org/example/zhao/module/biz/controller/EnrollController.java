@@ -34,10 +34,12 @@ public class EnrollController {
 
     @PostMapping
     public R<Long> enroll(@Validated @RequestBody EnrollReq req) {
+        /*防重复报名检查*/
         Long cnt = studentCourseMapper.selectCount(new LambdaQueryWrapper<StudentCourse>()
                 .eq(StudentCourse::getStudentId, req.getStudentId())
                 .eq(StudentCourse::getCourseId, req.getCourseId()));
         if (cnt != null && cnt > 0) throw new BizException("该学员已报名该课程");
+        /*创建报名记录*/
         StudentCourse sc = new StudentCourse();
         sc.setStudentId(req.getStudentId());
         sc.setCourseId(req.getCourseId());

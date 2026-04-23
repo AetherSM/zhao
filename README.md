@@ -69,6 +69,5 @@ npm run dev
 
 - `TEACHER`：仅可访问排课/考勤相关接口（`/api/v1/schedule/**`、`/api/v1/attendance/**`）
 - `FINANCE`：仅可访问缴费/营收统计相关接口（`/api/v1/payment/**`、`/api/v1/statistics/revenue`）
-- `ORG_ADMIN`：业务模块全权限
-- `SUPER_ADMIN`：全权限
+- `ADMIN`：管理员（辅导机构业务与教务管理相关接口）
 

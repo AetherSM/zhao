@@ -23,11 +23,11 @@
     <div class="grid">
       <el-card class="box">
         <template #header>学员统计</template>
-        <div ref="studentEl" style="height: 320px"></div>
+        <div ref="studentEl" style="height: 320px; width: 100%"></div>
       </el-card>
       <el-card class="box">
         <template #header>营收统计</template>
-        <div ref="revEl" style="height: 320px"></div>
+        <div ref="revEl" style="height: 320px; width: 100%"></div>
       </el-card>
     </div>
   </el-card>
@@ -49,34 +49,46 @@ const fmt = (d) => d.toISOString().slice(0, 10)
 const rev = ref({ start: fmt(start), end: fmt(today), type: 'month' })
 
 async function loadStudent() {
-  const data = await statStudent({ type: studentType.value })
-  const names = (data || []).map((i) => i.name)
-  const values = (data || []).map((i) => i.value)
-  studentChart.setOption({
-    tooltip: {},
-    xAxis: { type: 'category', data: names },
-    yAxis: { type: 'value' },
-    series: [{ type: 'bar', data: values }]
-  })
+  try {
+    const data = await statStudent({ type: studentType.value })
+    const names = (data || []).map((i) => i.name)
+    const values = (data || []).map((i) => Number(i.value))
+    studentChart.setOption({
+      tooltip: {},
+      xAxis: { type: 'category', data: names },
+      yAxis: { type: 'value' },
+      series: [{ type: 'bar', data: values }]
+    })
+  } catch (e) {
+    console.error('Failed to load student statistics', e)
+  }
 }
 
 async function loadRevenue() {
-  const data = await statRevenue({ startTime: rev.value.start, endTime: rev.value.end, type: rev.value.type })
-  const names = (data || []).map((i) => i.name)
-  const values = (data || []).map((i) => i.value)
-  revChart.setOption({
-    tooltip: {},
-    xAxis: { type: 'category', data: names },
-    yAxis: { type: 'value' },
-    series: [{ type: 'line', data: values }]
-  })
+  try {
+    const data = await statRevenue({ startTime: rev.value.start, endTime: rev.value.end, type: rev.value.type })
+    const names = (data || []).map((i) => i.name)
+    const values = (data || []).map((i) => Number(i.value))
+    revChart.setOption({
+      tooltip: {},
+      xAxis: { type: 'category', data: names },
+      yAxis: { type: 'value' },
+      series: [{ type: 'line', data: values }]
+    })
+  } catch (e) {
+    console.error('Failed to load revenue statistics', e)
+  }
 }
 
 onMounted(async () => {
   studentChart = echarts.init(studentEl.value)
   revChart = echarts.init(revEl.value)
-  await loadStudent()
-  await loadRevenue()
+  loadStudent()
+  loadRevenue()
+  window.addEventListener('resize', () => {
+    studentChart?.resize()
+    revChart?.resize()
+  })
 })
 </script>
 

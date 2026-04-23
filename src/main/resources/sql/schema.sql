@@ -225,26 +225,48 @@ CREATE TABLE IF NOT EXISTS chat_message (
 
 -- =====================
 -- Seed data (roles + admin)
--- =====================Demo password: 123456 (生产环境请改为 BCrypt 存储)
+-- =====================
+-- Demo password: 123456 (BCrypt: $2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOn2)
 -- =====================
 
 INSERT INTO sys_role (id, role_name, role_code, description)
 VALUES
-  (1, '超级管理员', 'SUPER_ADMIN', '系统所有功能权限'),
-  (2, '机构管理员', 'ORG_ADMIN', '机构业务管理'),
-  (3, '教师', 'TEACHER', '教师端权限'),
-  (4, '财务', 'FINANCE', '财务端权限'),
-  (5, '学员/家长', 'STUDENT', '学员端权限')
+  (1, '管理员', 'ADMIN', '辅导机构业务与教务管理：学员、教师、课程、排课、考勤、缴费与统计等'),
+  (2, '教师', 'TEACHER', '教师端权限'),
+  (3, '财务', 'FINANCE', '财务端权限'),
+  (4, '学员/家长', 'STUDENT', '学员端权限')
 ON DUPLICATE KEY UPDATE role_name=VALUES(role_name), role_code=VALUES(role_code), description=VALUES(description);
 
 INSERT INTO sys_user (id, username, password, real_name, status)
 VALUES
-  (1, 'admin', '123456', '系统管理员', 1)
+  (1, 'admin', '123456', '管理员', 1),
+  (2, 'orgadmin', '123456', '机构管理员', 1),
+  (3, 'finance1', '123456', '财务', 1),
+  -- 教师账号 (ID 2001-2006)
+  (2001, 'teacher2001', '123456', '李老师', 1),
+  (2002, 'teacher2002', '123456', '王老师', 1),
+  (2003, 'teacher2003', '123456', '张老师', 1),
+  (2004, 'teacher2004', '123456', '刘老师', 1),
+  (2005, 'teacher2005', '123456', '陈老师', 1),
+  (2006, 'teacher2006', '123456', '周老师', 1),
+  -- 学员账号 (ID 4001-4006)
+  (4001, 'student4001', '123456', '王小宝', 1),
+  (4002, 'student4002', '123456', '赵小雨', 1),
+  (4003, 'student4003', '123456', '陈同学', 1),
+  (4004, 'student4004', '123456', '孙小涵', 1),
+  (4005, 'student4005', '123456', '周子轩', 1),
+  (4006, 'student4006', '123456', '吴思琪', 1)
 ON DUPLICATE KEY UPDATE real_name=VALUES(real_name), status=VALUES(status);
 
 INSERT INTO sys_user_role (id, user_id, role_id)
 VALUES
-  (1, 1, 1)
+  (1, 1, 1),
+  (2, 2, 1),
+  (3, 3, 3),
+  -- 教师角色
+  (2001, 2001, 2), (2002, 2002, 2), (2003, 2003, 2), (2004, 2004, 2), (2005, 2005, 2), (2006, 2006, 2),
+  -- 学员角色
+  (4001, 4001, 4), (4002, 4002, 4), (4003, 4003, 4), (4004, 4004, 4), (4005, 4005, 4), (4006, 4006, 4)
 ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), role_id=VALUES(role_id);
 
 -- =====================
@@ -255,79 +277,122 @@ INSERT INTO course_category (id, category_name, sort)
 VALUES
   (1001, '小学数学', 1),
   (1002, '初中英语', 2),
-  (1003, '高中物理', 3)
+  (1003, '高中物理', 3),
+  (1004, '初中数学', 4),
+  (1005, '小学语文', 5),
+  (1006, '高中英语', 6)
 ON DUPLICATE KEY UPDATE category_name=VALUES(category_name), sort=VALUES(sort);
 
 INSERT INTO teacher (id, teacher_name, gender, age, teach_years, subject, phone)
 VALUES
   (2001, '李老师', 1, 32, 8, '数学', '13800138001'),
   (2002, '王老师', 2, 29, 5, '英语', '13800138002'),
-  (2003, '张老师', 1, 35, 10, '物理', '13800138003')
+  (2003, '张老师', 1, 35, 10, '物理', '13800138003'),
+  (2004, '刘老师', 1, 38, 12, '数学', '13800138004'),
+  (2005, '陈老师', 2, 33, 6, '语文', '13800138005'),
+  (2006, '周老师', 2, 31, 7, '英语', '13800138006')
 ON DUPLICATE KEY UPDATE teacher_name=VALUES(teacher_name), subject=VALUES(subject), phone=VALUES(phone);
+
+INSERT INTO sys_user_teacher (id, user_id, teacher_id)
+VALUES
+  (2001, 2001, 2001), (2002, 2002, 2002), (2003, 2003, 2003), (2004, 2004, 2004), (2005, 2005, 2005), (2006, 2006, 2006)
+ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), teacher_id=VALUES(teacher_id);
 
 INSERT INTO course (id, course_name, category_id, price, total_hours, apply_grade, description)
 VALUES
   (3001, '小学数学培优班', 1001, 80.00, 40, '小学 3-4 年级', '数学培优'),
   (3002, '初中英语提分班', 1002, 90.00, 36, '初中 1-2 年级', '英语提分'),
-  (3003, '高中物理冲刺班', 1003, 120.00, 30, '高中 2-3 年级', '物理冲刺')
+  (3003, '高中物理冲刺班', 1003, 120.00, 30, '高中 2-3 年级', '物理冲刺'),
+  (3004, '初中数学提高班', 1004, 85.00, 32, '初中 2-3 年级', '代数几何综合'),
+  (3005, '小学语文阅读与写作', 1005, 70.00, 30, '小学 3-6 年级', '阅读写作训练'),
+  (3006, '高中英语冲刺班', 1006, 130.00, 28, '高中 1-3 年级', '高考英语专项'),
+  (3007, '小学数学思维训练', 1001, 75.00, 36, '小学 4-6 年级', '奥数入门')
 ON DUPLICATE KEY UPDATE course_name=VALUES(course_name), price=VALUES(price), total_hours=VALUES(total_hours);
 
 INSERT INTO student (id, student_name, gender, age, grade, phone, address, enroll_time)
 VALUES
   (4001, '王小宝', 1, 9, '小学 3 年级', '13900139001', 'XX小区1号', '2024-01-10'),
   (4002, '赵小雨', 2, 13, '初中 1 年级', '13900139002', 'XX小区2号', '2024-02-05'),
-  (4003, '陈同学', 1, 17, '高中 2 年级', '13900139003', 'XX小区3号', '2024-03-01')
+  (4003, '陈同学', 1, 17, '高中 2 年级', '13900139003', 'XX小区3号', '2024-03-01'),
+  (4004, '孙小涵', 2, 14, '初中 2 年级', '13900139004', '阳光花园 5 栋', '2025-02-01'),
+  (4005, '周子轩', 1, 11, '小学 5 年级', '13900139005', '学府路 18 号', '2025-02-18'),
+  (4006, '吴思琪', 2, 16, '高中 1 年级', '13900139006', '滨江小区 2 期', '2025-03-05')
 ON DUPLICATE KEY UPDATE student_name=VALUES(student_name), grade=VALUES(grade), phone=VALUES(phone);
+
+INSERT INTO sys_user_student (id, user_id, student_id)
+VALUES
+  (4001, 4001, 4001), (4002, 4002, 4002), (4003, 4003, 4003), (4004, 4004, 4004), (4005, 4005, 4005), (4006, 4006, 4006)
+ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), student_id=VALUES(student_id);
 
 INSERT INTO student_course (id, student_id, course_id, sign_time)
 VALUES
   (5001, 4001, 3001, '2024-01-12 10:00:00'),
   (5002, 4002, 3002, '2024-02-10 10:00:00'),
-  (5003, 4003, 3003, '2024-03-02 10:00:00')
+  (5003, 4003, 3003, '2024-03-02 10:00:00'),
+  (5004, 4004, 3004, '2025-02-05 14:00:00'),
+  (5005, 4005, 3005, '2025-02-20 10:30:00'),
+  (5006, 4006, 3006, '2025-03-08 09:00:00'),
+  (5007, 4001, 3005, '2025-03-01 11:00:00'),
+  (5008, 4002, 3006, '2025-03-10 15:00:00'),
+  (5009, 4005, 3007, '2025-03-12 16:00:00')
 ON DUPLICATE KEY UPDATE sign_time=VALUES(sign_time);
 
 INSERT INTO course_schedule (id, course_id, teacher_id, classroom, schedule_date, class_period)
 VALUES
   (6001, 3001, 2001, '101 教室', '2024-03-15', '上午 1-2 节'),
   (6002, 3002, 2002, '102 教室', '2024-03-16', '下午 3-4 节'),
-  (6003, 3003, 2003, '201 教室', '2024-03-17', '晚上 1-2 节')
+  (6003, 3003, 2003, '201 教室', '2024-03-17', '晚上 1-2 节'),
+  (6004, 3004, 2004, '103 教室', '2025-09-10', '上午 3-4 节'),
+  (6005, 3005, 2005, '104 教室', '2025-09-11', '下午 1-2 节'),
+  (6006, 3006, 2006, '202 教室', '2025-09-12', '晚上 1-2 节'),
+  (6007, 3007, 2001, '101 教室', '2025-09-15', '上午 1-2 节'),
+  (6008, 3002, 2002, '102 教室', '2025-09-16', '下午 3-4 节'),
+  (6009, 3001, 2001, '101 教室', '2025-09-17', '上午 3-4 节')
 ON DUPLICATE KEY UPDATE classroom=VALUES(classroom);
 
 INSERT INTO payment (id, student_id, course_id, amount, pay_time, pay_type, remark)
 VALUES
   (7001, 4001, 3001, 800.00, '2024-03-10 10:00:00', '微信', '预缴一部分'),
-  (7002, 4002, 3002, 3240.00, '2024-03-11 10:00:00', '支付宝', '全额缴费')
+  (7002, 4002, 3002, 3240.00, '2024-03-11 10:00:00', '支付宝', '全额缴费'),
+  (7003, 4004, 3004, 2720.00, '2025-02-28 11:20:00', '微信', '一期学费'),
+  (7004, 4005, 3005, 2100.00, '2025-02-25 09:00:00', '支付宝', '全额'),
+  (7005, 4006, 3006, 3640.00, '2025-03-15 14:00:00', '银行卡', '分期首笔'),
+  (7006, 4001, 3005, 1400.00, '2025-03-02 10:00:00', '微信', '语文班'),
+  (7007, 4002, 3006, 2000.00, '2025-03-11 12:00:00', '微信', '英语冲刺部分缴费')
 ON DUPLICATE KEY UPDATE amount=VALUES(amount), pay_time=VALUES(pay_time);
 
 INSERT INTO student_attendance (id, student_id, schedule_id, attendance_status, attendance_time, remark)
 VALUES
   (8001, 4001, 6001, 1, '2024-03-15 09:00:00', '正常'),
-  (8002, 4002, 6002, 2, '2024-03-16 15:05:00', '迟到5分钟')
+  (8002, 4002, 6002, 2, '2024-03-16 15:05:00', '迟到5分钟'),
+  (8003, 4004, 6004, 1, '2025-09-10 08:50:00', '正常'),
+  (8004, 4005, 6005, 1, '2025-09-11 13:55:00', '正常'),
+  (8005, 4006, 6006, 4, '2025-09-12 18:30:00', '病假缺勤'),
+  (8006, 4001, 6007, 2, '2025-09-15 08:08:00', '迟到'),
+  (8007, 4002, 6008, 1, '2025-09-16 14:50:00', '正常'),
+  (8008, 4001, 6009, 1, '2025-09-17 08:02:00', '正常')
 ON DUPLICATE KEY UPDATE attendance_status=VALUES(attendance_status), remark=VALUES(remark);
 
--- extra demo users
-INSERT INTO sys_user (id, username, password, real_name, status)
+INSERT INTO course_review (id, student_id, course_id, teacher_id, rating, comment, create_time, deleted)
 VALUES
-  (2, 'orgadmin', '123456', '机构管理员', 1),
-  (3, 'teacher1', '123456', '李老师(账号)', 1),
-  (4, 'finance1', '123456', '财务(账号)', 1),
-  (5, 'student1', '123456', '王小宝(账号)', 1)
-ON DUPLICATE KEY UPDATE real_name=VALUES(real_name), status=VALUES(status);
+  (9001, 4001, 3001, 2001, 5, '李老师讲课很清楚，孩子很喜欢。', '2025-08-20 19:30:00', 0),
+  (9002, 4002, 3002, 2002, 4, '英语课互动多，作业量适中。', '2025-08-22 16:00:00', 0),
+  (9003, 4003, 3003, 2003, 5, '物理实验演示很棒，提分明显。', '2025-08-25 10:15:00', 0),
+  (9004, 4004, 3004, 2004, 4, '数学难度合适，希望增加习题课。', '2025-09-01 20:00:00', 0)
+ON DUPLICATE KEY UPDATE rating=VALUES(rating), comment=VALUES(comment);
 
-INSERT INTO sys_user_role (id, user_id, role_id)
+INSERT INTO learning_resource (id, title, type, course_id, teacher_id, content, create_time, deleted)
 VALUES
-  (2, 2, 2),
-  (3, 3, 3),
-  (4, 4, 4),
-  (5, 5, 5)
-ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), role_id=VALUES(role_id);
+  (9101, '第三单元课后练习', 'HOMEWORK', 3001, 2001, '完成练习册 P32-P35，拍照上传。', '2025-09-01 08:00:00', 0),
+  (9102, '英语时态梳理讲义', 'MATERIAL', 3002, 2002, '一般现在时与现在完成时对比 PDF 已发班级群。', '2025-09-05 12:00:00', 0),
+  (9103, '力学公式速记卡', 'MATERIAL', 3003, 2003, '牛顿三定律一页纸总结。', '2025-09-06 09:30:00', 0),
+  (9104, '周末阅读一篇', 'HOMEWORK', 3005, 2005, '课外阅读《草房子》第 1-2 章，写 200 字读后感。', '2025-09-12 17:00:00', 0)
+ON DUPLICATE KEY UPDATE title=VALUES(title), content=VALUES(content);
 
-INSERT INTO sys_user_teacher (id, user_id, teacher_id)
+INSERT INTO chat_message (id, from_user_id, to_user_id, content, is_read, create_time)
 VALUES
-  (1, 3, 2001)
-ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), teacher_id=VALUES(teacher_id);
-
-INSERT INTO sys_user_student (id, user_id, student_id)
-VALUES
-  (1, 5, 4001)
-ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), student_id=VALUES(student_id);
+  (9201, 4001, 2001, '老师好，请问本周数学作业截止时间是？', 1, '2025-09-08 19:00:00'),
+  (9202, 2001, 4001, '周五晚 21:00 前提交即可。', 1, '2025-09-08 19:15:00'),
+  (9203, 4001, 2001, '收到，谢谢老师！', 0, '2025-09-08 19:16:00'),
+  (9204, 1, 2001, '请李老师本周五前提交教研组月度小结。', 1, '2025-09-09 09:00:00')
+ON DUPLICATE KEY UPDATE content=VALUES(content);

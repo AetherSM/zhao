@@ -77,7 +77,7 @@ import { useAuthStore } from '../store/auth'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const auth = useAuthStore()
-const isAdmin = computed(() => auth.user?.roles.some(r => ['SUPER_ADMIN', 'ORG_ADMIN'].includes(r)))
+const isAdmin = computed(() => auth.user?.roles.includes('ADMIN'))
 const isStudent = computed(() => auth.user?.roles.includes('STUDENT'))
 
 const reviews = ref([])

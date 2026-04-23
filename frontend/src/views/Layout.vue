@@ -8,7 +8,7 @@
           <span>仪表盘</span>
         </el-menu-item>
         
-        <el-sub-menu v-if="canAny(['SUPER_ADMIN','ORG_ADMIN'])" index="student-mgmt">
+        <el-sub-menu v-if="canAny(['ADMIN'])" index="student-mgmt">
           <template #title>
             <el-icon><User /></el-icon>
             <span>学员与报名</span>
@@ -17,53 +17,58 @@
           <el-menu-item index="/enroll">课程报名</el-menu-item>
         </el-sub-menu>
 
-        <el-sub-menu v-if="canAny(['SUPER_ADMIN','ORG_ADMIN'])" index="course-mgmt">
+        <el-sub-menu v-if="canAny(['ADMIN'])" index="course-mgmt">
           <template #title>
             <el-icon><Reading /></el-icon>
             <span>课程管理</span>
           </template>
           <el-menu-item index="/course-categories">课程分类</el-menu-item>
-          <el-menu-item index="/courses">所有课程</el-menu-item>
+          <el-menu-item index="/courses">所有班级</el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN'])" index="/teachers">
+        <el-menu-item v-if="canAny(['ADMIN'])" index="/teachers">
           <el-icon><Avatar /></el-icon>
           <span>教师管理</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/schedule">
+        <el-menu-item v-if="canAny(['ADMIN','TEACHER','STUDENT'])" index="/schedule">
           <el-icon><Calendar /></el-icon>
           <span>排课查询</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/attendance">
+        <el-menu-item v-if="canAny(['ADMIN','TEACHER','STUDENT'])" index="/attendance">
           <el-icon><Checked /></el-icon>
           <span>我的考勤</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/resources">
+        <el-menu-item v-if="canAny(['ADMIN','TEACHER','STUDENT'])" index="/resources">
           <el-icon><Files /></el-icon>
           <span>学习资源</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','STUDENT'])" index="/reviews">
+        <el-menu-item v-if="canAny(['ADMIN','STUDENT'])" index="/reviews">
           <el-icon><ChatDotRound /></el-icon>
           <span>评价反馈</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','TEACHER','STUDENT'])" index="/chat">
+        <el-menu-item v-if="canAny(['ADMIN','TEACHER','STUDENT'])" index="/chat">
           <el-icon><ChatLineRound /></el-icon>
           <span>家校沟通</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','FINANCE'])" index="/payments">
+        <el-menu-item v-if="canAny(['ADMIN','FINANCE'])" index="/payments">
           <el-icon><CreditCard /></el-icon>
           <span>缴费管理</span>
         </el-menu-item>
 
-        <el-menu-item v-if="canAny(['SUPER_ADMIN','ORG_ADMIN','FINANCE'])" index="/statistics">
+        <el-menu-item v-if="canAny(['ADMIN','FINANCE'])" index="/statistics">
           <el-icon><PieChart /></el-icon>
           <span>统计分析</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="canAny(['ADMIN'])" index="/role-scope">
+          <el-icon><Document /></el-icon>
+          <span>职责与权限说明</span>
         </el-menu-item>
       </el-menu>
     </aside>
@@ -110,7 +115,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../store/auth'
 import { updateProfileApi } from '../api/user'
 import { ElMessage } from 'element-plus'
-import { Monitor, User, Reading, Avatar, Calendar, Checked, CreditCard, PieChart, Files, ChatDotRound, ChatLineRound } from '@element-plus/icons-vue'
+import { Monitor, User, Reading, Avatar, Calendar, Checked, CreditCard, PieChart, Files, ChatDotRound, ChatLineRound, Document } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -153,8 +158,7 @@ async function handleUpdateProfile() {
 
 const roleText = computed(() => {
   const roles = auth.user?.roles || []
-  if (roles.includes('SUPER_ADMIN')) return '系统管理员'
-  if (roles.includes('ORG_ADMIN')) return '机构管理员'
+  if (roles.includes('ADMIN')) return '管理员'
   if (roles.includes('FINANCE')) return '财务管理'
   if (roles.includes('TEACHER')) return '任课教师'
   if (roles.includes('STUDENT')) return '学生/家长'

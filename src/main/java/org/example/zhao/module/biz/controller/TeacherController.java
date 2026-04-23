@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.zhao.common.api.R;
 import org.example.zhao.module.biz.entity.Teacher;
 import org.example.zhao.module.biz.mapper.TeacherMapper;
+import org.example.zhao.module.biz.dto.TeacherCreateReq;
+import org.example.zhao.module.biz.service.TeacherService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class TeacherController {
 
     private final TeacherMapper teacherMapper;
+    private final TeacherService teacherService;
 
     @GetMapping("/list")
     public R<Page<Teacher>> list(@RequestParam(defaultValue = "1") long page,
@@ -36,15 +39,13 @@ public class TeacherController {
     }
 
     @PostMapping
-    public R<Long> create(@RequestBody Teacher teacher) {
-        teacherMapper.insert(teacher);
-        return R.ok(teacher.getId());
+    public R<Long> create(@RequestBody TeacherCreateReq teacher) {
+        return R.ok(teacherService.createTeacher(teacher));
     }
 
     @PutMapping("/{id}")
     public R<Void> update(@PathVariable Long id, @RequestBody Teacher teacher) {
-        teacher.setId(id);
-        teacherMapper.updateById(teacher);
+        teacherService.updateTeacher(id, teacher);
         return R.ok();
     }
 

@@ -1,0 +1,1 @@
+import{z as e}from"./index-DaHCRH6N.js";function s(t){return e.get("/api/v1/student/list",{params:t})}function a(t){return e.post("/api/v1/student",t)}function d(t,n){return e.put(`/api/v1/student/${t}`,n)}function r(t){return e.delete(`/api/v1/student/${t}`)}function i(){return e.get("/api/v1/student/all-names")}export{a as c,r as d,i as g,s as l,d as u};

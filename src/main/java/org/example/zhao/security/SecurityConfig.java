@@ -60,26 +60,26 @@ public class SecurityConfig {
                 .antMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .antMatchers("/error").permitAll()
                 // finance
-                .antMatchers("/api/v1/payment/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "FINANCE")
-                .antMatchers("/api/v1/statistics/revenue").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "FINANCE")
+                .antMatchers("/api/v1/payment/**").hasAnyRole("ADMIN", "FINANCE")
+                .antMatchers("/api/v1/statistics/revenue").hasAnyRole("ADMIN", "FINANCE")
                 // teacher
-                .antMatchers("/api/v1/schedule/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "TEACHER")
-                .antMatchers("/api/v1/attendance/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "TEACHER", "STUDENT")
+                .antMatchers("/api/v1/schedule/**").hasAnyRole("ADMIN", "TEACHER")
+                .antMatchers("/api/v1/attendance/**").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
                 // course review
                 .antMatchers("/api/v1/courseReview/list").permitAll()
-                .antMatchers("/api/v1/courseReview/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "STUDENT")
+                .antMatchers("/api/v1/courseReview/**").hasAnyRole("ADMIN", "STUDENT")
                 // learning resource
-                .antMatchers("/api/v1/learningResource/list").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "TEACHER", "STUDENT")
-                .antMatchers("/api/v1/learningResource/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "TEACHER")
-                // org admin
-                .antMatchers("/api/v1/student/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN")
-                .antMatchers("/api/v1/teacher/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN")
-                .antMatchers("/api/v1/courseCategory/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN")
-                .antMatchers("/api/v1/course/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN")
-                .antMatchers("/api/v1/enroll/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN")
-                .antMatchers("/api/v1/statistics/student").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "TEACHER")
-                .antMatchers("/api/v1/statistics/course").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN", "TEACHER")
-                .antMatchers("/api/v1/statistics/**").hasAnyRole("SUPER_ADMIN", "ORG_ADMIN")
+                .antMatchers("/api/v1/learningResource/list").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+                .antMatchers("/api/v1/learningResource/**").hasAnyRole("ADMIN", "TEACHER")
+                // admin & finance & teacher
+                .antMatchers("/api/v1/student/**").hasAnyRole("ADMIN")
+                .antMatchers("/api/v1/teacher/**").hasAnyRole("ADMIN")
+                .antMatchers("/api/v1/courseCategory/**").hasAnyRole("ADMIN")
+                .antMatchers("/api/v1/course/**").hasAnyRole("ADMIN")
+                .antMatchers("/api/v1/enroll/**").hasAnyRole("ADMIN")
+                .antMatchers("/api/v1/statistics/student").hasAnyRole("ADMIN", "TEACHER", "FINANCE")
+                .antMatchers("/api/v1/statistics/course").hasAnyRole("ADMIN", "TEACHER", "FINANCE")
+                .antMatchers("/api/v1/statistics/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
         );
 
